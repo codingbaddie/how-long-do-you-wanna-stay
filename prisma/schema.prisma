@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Employee specific fields
+  employeeData EmployeeData?
+  
+  // Company specific fields
+  companyData CompanyData?
+  
+  @@map("users")
+}
+
+model EmployeeData {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Company information
+  companyName       String
+  companySize       CompanySize
+  industry          String
+  department        String
+  position          String
+  yearsAtCompany    Int
+  
+  // Retention data
+  intendedStayDuration String  // "less_than_6_months", "6_months_to_1_year", "1_to_2_years", "2_to_5_years", "more_than_5_years"
+  satisfactionScore Int       // 1-10 scale
+  workLifeBalance   Int       // 1-10 scale
+  careerGrowth      Int       // 1-10 scale
+  compensation      Int       // 1-10 scale
+  management        Int       // 1-10 scale
+  
+  // Additional insights
+  reasonsToLeave    String    // JSON array of reasons
+  reasonsToStay     String    // JSON array of reasons
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("employee_data")
+}
+
+model CompanyData {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  companyName   String
+  companySize   CompanySize
+  industry      String
+  
+  // Subscription data
+  subscriptionType SubscriptionType @default(BASIC)
+  subscriptionEndsAt DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("company_data")
+}
+
+model RetentionInsights {
+  id                    String   @id @default(cuid())
+  companyName           String
+  industry              String
+  companySize           CompanySize
+  department            String?
+  
+  // Aggregated metrics
+  avgIntendedStayDuration Float
+  avgSatisfactionScore    Float
+  avgWorkLifeBalance      Float
+  avgCareerGrowth         Float
+  avgCompensation         Float
+  avgManagement           Float
+  
+  // Risk indicators
+  highRiskCount         Int      // Employees likely to leave within 6 months
+  mediumRiskCount       Int      // Employees likely to leave within 1 year
+  lowRiskCount          Int      // Employees likely to stay long-term
+  
+  // Sample size for data reliability
+  sampleSize            Int
+  
+  // Common themes
+  topReasonsToLeave     String    // JSON array of reasons
+  topReasonsToStay      String    // JSON array of reasons
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@unique([companyName, industry, companySize, department])
+  @@map("retention_insights")
+}
+
+enum Role {
+  EMPLOYEE
+  COMPANY
+  ADMIN
+}
+
+enum CompanySize {
+  STARTUP_1_10
+  SMALL_11_50
+  MEDIUM_51_200
+  LARGE_201_1000
+  ENTERPRISE_1000_PLUS
+}
+
+enum SubscriptionType {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}

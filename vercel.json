@@ -1,0 +1,24 @@
+{
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true"
+    }
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "redirects": [
+    {
+      "source": "/api/auth/signin",
+      "destination": "/auth/signin",
+      "permanent": false
+    },
+    {
+      "source": "/api/auth/signup",
+      "destination": "/auth/signup",
+      "permanent": false
+    }
+  ]
+}
