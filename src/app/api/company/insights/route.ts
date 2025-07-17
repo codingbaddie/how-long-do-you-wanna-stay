@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function calculateBenchmarks(insights: any[]): any {
+function calculateBenchmarks(insights: any[]): any | null {
   if (insights.length === 0) return null
 
   const weightedSum = insights.reduce((acc, insight) => {

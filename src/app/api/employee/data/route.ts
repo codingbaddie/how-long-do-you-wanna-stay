@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     
@@ -151,7 +151,7 @@ async function updateRetentionInsights(companyName: string, industry: string, co
   })
 }
 
-function calculateAvgStayDuration(data: any[]): number {
+function calculateAvgStayDuration(data: { intendedStayDuration: string }[]): number {
   const durationMap = {
     'less_than_6_months': 0.25,
     '6_months_to_1_year': 0.75,
@@ -168,7 +168,7 @@ function average(numbers: number[]): number {
   return numbers.reduce((sum, num) => sum + num, 0) / numbers.length
 }
 
-function calculateRiskCounts(data: any[]): { high: number; medium: number; low: number } {
+function calculateRiskCounts(data: { intendedStayDuration: string }[]): { high: number; medium: number; low: number } {
   return data.reduce((counts, emp) => {
     if (emp.intendedStayDuration === 'less_than_6_months') counts.high++
     else if (emp.intendedStayDuration === '6_months_to_1_year') counts.medium++

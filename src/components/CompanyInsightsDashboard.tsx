@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 interface CompanyInsightsDashboardProps {
-  companyData: any
+  companyData: {
+    companyName: string
+    industry: string
+    companySize: string
+  } | null
 }
 
 export default function CompanyInsightsDashboard({ companyData }: CompanyInsightsDashboardProps) {
@@ -18,9 +22,9 @@ export default function CompanyInsightsDashboard({ companyData }: CompanyInsight
     if (companyData) {
       fetchInsights()
     }
-  }, [companyData, selectedDepartment])
+  }, [companyData, selectedDepartment, fetchInsights])
 
-  const fetchInsights = async () => {
+  const fetchInsights = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -62,7 +66,7 @@ export default function CompanyInsightsDashboard({ companyData }: CompanyInsight
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [companyData, selectedDepartment])
 
   const handleDepartmentFilter = (department: string) => {
     setSelectedDepartment(department)
