@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
@@ -7,17 +7,17 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'EMPLOYEE') {
+    if (!session || (session as any).user.role !== 'EMPLOYEE') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const data = await request.json()
     
     const employeeData = await prisma.employeeData.upsert({
-      where: { userId: session.user.id },
+      where: { userId: (session as any).user.id },
       update: {
         companyName: data.companyName,
-        companySize: data.companySize,
+        companySize: data.companySize as any,
         industry: data.industry,
         department: data.department,
         position: data.position,
@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
         reasonsToStay: JSON.stringify(data.reasonsToStay)
       },
       create: {
-        userId: session.user.id,
+        userId: (session as any).user.id,
         companyName: data.companyName,
-        companySize: data.companySize,
+        companySize: data.companySize as any,
         industry: data.industry,
         department: data.department,
         position: data.position,
@@ -64,12 +64,12 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'EMPLOYEE') {
+    if (!session || (session as any).user.role !== 'EMPLOYEE') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const employeeData = await prisma.employeeData.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: (session as any).user.id }
     })
 
     if (employeeData) {
@@ -89,7 +89,7 @@ async function updateRetentionInsights(companyName: string, industry: string, co
     where: {
       companyName,
       industry,
-      companySize,
+      companySize: companySize as any,
       ...(department && { department })
     }
   })
@@ -112,8 +112,8 @@ async function updateRetentionInsights(companyName: string, industry: string, co
       companyName_industry_companySize_department: {
         companyName,
         industry,
-        companySize,
-        department: department || null
+        companySize: companySize as any,
+        department: department as any
       }
     },
     update: {
@@ -133,7 +133,7 @@ async function updateRetentionInsights(companyName: string, industry: string, co
     create: {
       companyName,
       industry,
-      companySize,
+      companySize: companySize as any,
       department,
       avgIntendedStayDuration,
       avgSatisfactionScore,
@@ -160,7 +160,7 @@ function calculateAvgStayDuration(data: { intendedStayDuration: string }[]): num
     'more_than_5_years': 7
   }
   
-  const total = data.reduce((sum, emp) => sum + (durationMap[emp.intendedStayDuration] || 0), 0)
+  const total = data.reduce((sum, emp) => sum + (durationMap[emp.intendedStayDuration as keyof typeof durationMap] || 0), 0)
   return total / data.length
 }
 

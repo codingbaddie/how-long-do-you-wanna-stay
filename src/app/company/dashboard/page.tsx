@@ -14,12 +14,12 @@ export default function CompanyDashboard() {
   useEffect(() => {
     if (status === 'loading') return
 
-    if (!session || session.user.role !== 'COMPANY') {
+    if (!session || (session as any).user?.role !== 'COMPANY') {
       router.push('/auth/signin?role=company')
       return
     }
 
-    setCompanyData(session.user.companyData)
+    setCompanyData((session as any).user.companyData)
     setIsLoading(false)
   }, [session, status, router])
 
@@ -36,7 +36,7 @@ export default function CompanyDashboard() {
     )
   }
 
-  if (!session || session.user.role !== 'COMPANY') {
+  if (!session || (session as any).user?.role !== 'COMPANY') {
     return null
   }
 
@@ -47,10 +47,10 @@ export default function CompanyDashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Company Dashboard</h1>
-              <p className="text-gray-600">Welcome, {session.user.email}</p>
+              <p className="text-gray-600">Welcome, {(session as any).user.email}</p>
               {companyData && (
                 <p className="text-sm text-gray-500">
-                  {companyData.companyName} • {companyData.industry}
+                  {(companyData as any).companyName} • {(companyData as any).industry}
                 </p>
               )}
             </div>

@@ -14,7 +14,7 @@ export default function EmployeeDashboard() {
   useEffect(() => {
     if (status === 'loading') return
 
-    if (!session || session.user.role !== 'EMPLOYEE') {
+    if (!session || (session as any).user?.role !== 'EMPLOYEE') {
       router.push('/auth/signin?role=employee')
       return
     }
@@ -72,7 +72,7 @@ export default function EmployeeDashboard() {
     )
   }
 
-  if (!session || session.user.role !== 'EMPLOYEE') {
+  if (!session || (session as any).user?.role !== 'EMPLOYEE') {
     return null
   }
 
@@ -83,7 +83,7 @@ export default function EmployeeDashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Employee Dashboard</h1>
-              <p className="text-gray-600">Welcome, {session.user.email}</p>
+              <p className="text-gray-600">Welcome, {(session as any).user.email}</p>
             </div>
             <button
               onClick={handleSignOut}

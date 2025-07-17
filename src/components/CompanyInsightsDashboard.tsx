@@ -18,13 +18,9 @@ export default function CompanyInsightsDashboard({ companyData }: CompanyInsight
   const [error, setError] = useState<string | null>(null)
   const [selectedDepartment, setSelectedDepartment] = useState<string>('')
 
-  useEffect(() => {
-    if (companyData) {
-      fetchInsights()
-    }
-  }, [companyData, selectedDepartment, fetchInsights])
-
   const fetchInsights = useCallback(async () => {
+    if (!companyData) return
+    
     setIsLoading(true)
     setError(null)
 
@@ -67,6 +63,12 @@ export default function CompanyInsightsDashboard({ companyData }: CompanyInsight
       setIsLoading(false)
     }
   }, [companyData, selectedDepartment])
+
+  useEffect(() => {
+    if (companyData) {
+      fetchInsights()
+    }
+  }, [companyData, selectedDepartment, fetchInsights])
 
   const handleDepartmentFilter = (department: string) => {
     setSelectedDepartment(department)

@@ -13,9 +13,9 @@ export default function HomePage() {
     if (status === 'loading') return
 
     if (session) {
-      if (session.user.role === 'EMPLOYEE') {
+      if ((session as any).user?.role === 'EMPLOYEE') {
         router.push('/employee/dashboard')
-      } else if (session.user.role === 'COMPANY') {
+      } else if ((session as any).user?.role === 'COMPANY') {
         router.push('/company/dashboard')
       }
     }

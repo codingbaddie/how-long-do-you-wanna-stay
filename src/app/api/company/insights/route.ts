@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'COMPANY') {
+    if (!session || (session as any).user.role !== 'COMPANY') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       where: {
         companyName,
         industry,
-        companySize,
+        companySize: companySize as any,
         ...(department && { department })
       }
     })
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session || session.user.role !== 'COMPANY') {
+    if (!session || (session as any).user.role !== 'COMPANY') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     // Check if company has access to this data (subscription check)
     const companyData = await prisma.companyData.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: (session as any).user.id }
     })
 
     if (!companyData) {
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const industryBenchmarks = await prisma.retentionInsights.findMany({
       where: {
         industry,
-        companySize,
+        companySize: companySize as any,
         NOT: { companyName }
       },
       select: {

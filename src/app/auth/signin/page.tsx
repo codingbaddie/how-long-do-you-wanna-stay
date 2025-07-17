@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function SignInPage() {
+function SignInForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -30,9 +30,9 @@ export default function SignInPage() {
         setError('Invalid credentials')
       } else {
         const session = await getSession()
-        if (session?.user?.role === 'EMPLOYEE') {
+        if ((session as any)?.user?.role === 'EMPLOYEE') {
           router.push('/employee/dashboard')
-        } else if (session?.user?.role === 'COMPANY') {
+        } else if ((session as any)?.user?.role === 'COMPANY') {
           router.push('/company/dashboard')
         }
       }
@@ -132,5 +132,13 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   )
 }
